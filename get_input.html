@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+      
+        .container {
+            display: flex; /* Enable flexbox for the container */
+        }
+        .completed, .remove {
+            margin-right: 200px; /* Add space to the right of each div */
+            flex: 1; /* Allow divs to take equal space */
+            padding: 10px;
+           
+        }
+        .remove {
+            margin-right: 400; /* Remove right margin from the last div to avoid extra space */
+        }
+    
+    </style>
+
+
+</head>
+<body>
+    <form id="myForm">
+        <label for="task">Task:</label>
+        <input type="text" id="task" name="task"><br>
+        <input type="submit" value="Submit">
+      </form>
+
+
+    
+      
+
+      
+  
+      
+      <script>
+        
+        const form = document.getElementById("myForm");
+        let tasks = []; 
+        //let taskCounter = 1; // Initialize a counter for task numbering
+
+
+        form.addEventListener("submit", function(event) {
+          event.preventDefault(); // Prevent default form submission
+
+          const nameInput = document.getElementById("task");
+          const task = nameInput.value;
+
+          tasks.push(task); // Add the new task to the array
+          localStorage.setItem("mykey", JSON.stringify(tasks)); // Store the updated array in local storage
+
+          console.log("User tasks:", tasks);
+                // Add the new task to the list (DOM manipulation)
+          const taskList = document.getElementById("taskList");
+          const newListItem = document.createElement("li");
+          newListItem.textContent = task; 
+
+          taskList.appendChild(newListItem);
+          
+          nameInput.value = ""; // Clear the input field
+        });
+
+        
+      
+
+    </script>
+</body>
+</html>
