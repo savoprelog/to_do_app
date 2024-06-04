@@ -1,72 +1,122 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <style>
-      
-        .container {
-            display: flex; /* Enable flexbox for the container */
-        }
-        .completed, .remove {
-            margin-right: 200px; /* Add space to the right of each div */
-            flex: 1; /* Allow divs to take equal space */
-            padding: 10px;
-           
-        }
-        .remove {
-            margin-right: 400; /* Remove right margin from the last div to avoid extra space */
-        }
-    
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>To Do List</title>
+  <style>
+    .todo-list {
+      /* Add styles for the to-do list (optional) */
+    }
+    .todo-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
 
+    .todo-item.completed {
+      /* Style for completed tasks (e.g., green text) */
+      color: green;
+    }
 
+    .todo-item.important {
+      /* Style for important tasks (optional) */
+      font-weight: bold; /* Example styling for important tasks */
+    }
+  </style>
 </head>
 <body>
-    <form id="myForm">
-        <label for="task">Task:</label>
-        <input type="text" id="task" name="task"><br>
-        <input type="submit" value="Submit">
-      </form>
+  <form id="todo-form" action="#">
+    <h2>To Do List</h2>
+    <label for="task">Task:</label>
+    <input type="text" id="task" name="task" placeholder="Your Task"><br><br>
+    <input type="submit" value="Add Task">
+  </form>
+  <br>
 
+  <div class="todo-list"></div>
+  <script>
+    const todoList = document.querySelector('.todo-list');
+    const todoForm = document.getElementById('todo-form');
 
-    
-      
+    document.addEventListener('DOMContentLoaded', function() {
+      // Load tasks from local storage and display them
+      const tasks = JSON.parse(localStorage.getItem('todos')) || [];
+      tasks.forEach(task => {
+        createTodoItem(task.text, task.completed, task.important);
+      });
+    });
 
-      
-  
-      
-      <script>
+    todoForm.addEventListener('submit', function(event) {
+      event.preventDefault(); // Prevent default form submission
+
+      const taskInput = document.getElementById('task');
+      const taskText = taskInput.value.trim();
+
+      if (taskText) {
+        // Retrieve existing tasks from local storage (or create an empty array)
+        let tasks = JSON.parse(localStorage.getItem('todos')) || [];
+
+        // Add new task to the array
+        const newTask = { text: taskText, completed: false, important: false };
+        tasks.push(newTask);
+
+        // Update local storage
+        localStorage.setItem('todos', JSON.stringify(tasks));
+
+        // Create and display the new to-do item
+        createTodoItem(taskText, false, false);
+
+        // Clear the input field
+        taskInput.value = '';
+      }
+    });
+
+    function createTodoItem(taskText, completed, important) {
+      const todoItem = document.createElement('div');
+      todoItem.classList.add('todo-item');
+      if (completed) {
+        todoItem.classList.add('completed');
+      }
+      if (important) {
+        todoItem.classList.add('important');
+      }
+
+      const taskLabel = document.createElement('label');
+      taskLabel.innerText = taskText;
+
+      const checkboxCompleted = document.createElement('input');
+      checkboxCompleted.type = 'checkbox';
+      checkboxCompleted.checked = completed;
+      checkboxCompleted.addEventListener('change', function() {
+        const taskIndex = [...todoList.children].indexOf(todoItem);
+        let tasks = JSON.parse(localStorage.getItem('todos')) || [];
+        tasks[taskIndex].completed = checkboxCompleted.checked;
+        localStorage.setItem('todos', JSON.stringify(tasks));
+        todoItem.classList.toggle('completed'); // Toggle "completed" class
+      });
+
+      const checkboxImportant = document.createElement('input');
+      checkboxImportant.type = 'checkbox';
+      checkboxImportant.checked = important;
+      checkboxImportant.addEventListener('change', function() {
+        const taskIndex = [...todoList.children].indexOf(todoItem);
+        let tasks = JSON.parse(localStorage.getItem('todos')) || [];
         
-        const form = document.getElementById("myForm");
-        let tasks = []; 
-        //let taskCounter = 1; // Initialize a counter for task numbering
-
-
-        form.addEventListener("submit", function(event) {
-          event.preventDefault(); // Prevent default form submission
-
-          const nameInput = document.getElementById("task");
-          const task = nameInput.value;
-
-          tasks.push(task); // Add the new task to the array
-          localStorage.setItem("mykey", JSON.stringify(tasks)); // Store the updated array in local storage
-
-          console.log("User tasks:", tasks);
-                // Add the new task to the list (DOM manipulation)
-          const taskList = document.getElementById("taskList");
-          const newListItem = document.createElement("li");
-          newListItem.textContent = task; 
-
-          taskList.appendChild(newListItem);
-          
-          nameInput.value = ""; // Clear the input field
-        });
-
+        // Remove the task from local storage and update the array
+        tasks.splice(taskIndex, 1);
+        localStorage.setItem('todos', JSON.stringify(tasks));
         
-      
+        // Remove the task from the DOM
+        todoItem.remove();
+      });
 
-    </script>
+      todoItem.appendChild(taskLabel);
+      todoItem.appendChild(checkboxCompleted);
+      todoItem.appendChild(checkboxImportant);
+
+      todoList.appendChild(todoItem);
+    }
+  </script>
 </body>
 </html>
